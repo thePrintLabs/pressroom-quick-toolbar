@@ -16,7 +16,6 @@ Release Notes:
 if ( !function_exists('add_action') )
 	die();
 
-
 if (!isset($no_issue_drafts_to_show)) { $no_issue_drafts_to_show = 3; }
 if (!isset($no_issue_future_to_show)) { $no_issue_future_to_show = 3; }
 if (!isset($no_issue_edits_to_show )) { $no_issue_edits_to_show  = 3; }
@@ -53,7 +52,7 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
     $wp_admin_bar->add_node( $args );
 
 /*
-    DRAFTS
+    DRAFTS ISSUES
     ========================================================================== */
 
     $issue_drafts_found = 'N';
@@ -95,14 +94,14 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
 
 
 /*
-    FUTURE
+    SCHEDULED ISSUES
     ========================================================================== */
 
     $issue_future_found = 'N';
     $issue_future = pr_recently_edited_issue_future();
 
     if (!empty($issue_future)) {
-        // separator from page_future to published
+        // separator
         $args = array(
             'id' => 'issue_item_d',
             'title' => '--- future ---',
@@ -135,13 +134,15 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
     }
 
 
-//////////////
+/*
+   PUBLISHED ISSUES
+   ========================================================================== */
 
-    // get list of pages
+    // get list of Issues
     $issues = pr_recently_edited_issues();
 
     if (!empty($issues)) {
-        // separator from issue_drafts to published
+        // separator
         $args = array(
             'id' => 'issue_item_c',
             'title' => '--- published ---',
@@ -173,7 +174,7 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
     }
 
     if (!empty($issues)) {
-        // separator from issue_drafts to published
+        // separator
         $args = array(
             'id' => 'issue_item_c',
             'title' => '--- published ---',
@@ -182,82 +183,6 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
         );
         $wp_admin_bar->add_node( $args );
     }
-}
-
-
-function pr_recently_edited_drafts() {
-	global $no_post_drafts_to_show;
-	$args = array(
-		'posts_per_page' => $no_post_drafts_to_show,
-		'sort_column' => 'post_modified',
-		'orderby' => 'post_date',
-		'post_status' => 'draft',
-		'order' => 'DESC'
-	);
-	$drafts = get_posts( $args );
-	return $drafts;
-}
-function pr_recently_edited_posts() {
-	global $no_post_edits_to_show;
-	$args = array(
-		'posts_per_page' => $no_post_edits_to_show,
-		'sort_column' => 'post_modified',
-		'orderby' => 'post_date',
-		'order' => 'DESC'
-	);
-	$posts = get_posts( $args );
-	return $posts;
-}
-function pr_recently_edited_posts_future() {
-	global $no_post_future_to_show;
-	$args = array(
-		'posts_per_page' => $no_post_future_to_show,
-		'sort_column' => 'post_modified',
-		'orderby' => 'post_date',
-		'post_status' => 'future',
-		'order' => 'DESC'
-	);
-	$posts = get_posts( $args );
-	return $posts;
-}
-function pr_recently_edited_pages() {
-	global $no_page_edits_to_show;
-	$args = array(
-		'number' => $no_page_edits_to_show,
-		'post_type' => 'page',
-		'post_status' => 'publish',
-		'sort_column' => 'post_modified',
-		'hierarchical' => 0,
-		'sort_order' => 'DESC'
-	);
-	$pages = get_pages( $args );
-	return $pages;
-}
-function pr_recently_edited_page_drafts() {
-	global $no_page_drafts_to_show;
-	$args = array(
-		'number' => $no_page_drafts_to_show,
-		'post_type' => 'page',
-		'post_status' => 'draft',
-		'sort_column' => 'post_modified',
-		'hierarchical' => 0,
-		'sort_order' => 'DESC'
-	);
-	$pagedraft = get_pages( $args );
-	return $pagedraft;
-}
-function pr_recently_edited_page_future() {
-	global $no_page_future_to_show;
-	$args = array(
-		'number' => $no_page_future_to_show,
-		'post_type' => 'page',
-		'post_status' => 'future',
-		'sort_column' => 'post_modified',
-		'hierarchical' => 0,
-		'sort_order' => 'DESC'
-	);
-	$pagefuture = get_pages( $args );
-	return $pagefuture;
 }
 
 function pr_recently_edited_issues() {
@@ -273,6 +198,7 @@ function pr_recently_edited_issues() {
 	$issues = get_posts( $args );
 	return $issues;
 }
+
 function pr_recently_edited_issue_drafts() {
 	global $no_issue_drafts_to_show;
 	$args = array(
@@ -286,6 +212,7 @@ function pr_recently_edited_issue_drafts() {
 	$issuedraft = get_posts( $args );
 	return $issuedraft;
 }
+
 function pr_recently_edited_issue_future() {
 	global $no_issue_future_to_show;
 	$args = array(
@@ -299,9 +226,9 @@ function pr_recently_edited_issue_future() {
 	$issuefuture = get_posts( $args );
 	return $issuefuture;
 }
+
 function return_short_title( $title_to_shorten, $if_empty ) {
-	// the variables passed
-//	$the_title = $title_to_shorten;
+    //	$the_title = $title_to_shorten;
 	$the_title = apply_filters('the_title', $title_to_shorten );
 	$return_if_empty = $if_empty;
 	$return_value = $the_title;
@@ -322,16 +249,5 @@ function return_short_title( $title_to_shorten, $if_empty ) {
 	}
 	return $return_value;
 }
-// This code adds the links in the settings section of the plugin
-if ( ! function_exists( 'pr_edit_toolbar_plugin_meta' ) ) :
-        function pr_edit_toolbar_plugin_meta( $links, $file ) { // add 'Plugin page' and 'Donate' links to plugin meta row
-                if ( strpos( $file, 'post-edit-toolbar.php' ) !== false ) {
-//                        $links = array_merge( $links, array( '<a href="http://www.webyourbusiness.com/post-edit-toolbar/#donate" title="Support the development">Donate</a>' ) );
-                        $links = array_merge( $links, array( '<a href="http://wordpress.org/support/view/plugin-reviews/post-edit-toolbar#postform" title="Review-Post-Edit-Toolbar">Please Review Post-Edit-Toolar</a>' ) );
-                        $links = array_merge( $links, array( '<a href="http://wordpress.org/support/plugin/post-edit-toolbar" title="Support-for-Post-Edit-Toolbar">Support</a>' ) );
-                }
-                return $links;
-        }
-        add_filter( 'plugin_row_meta', 'pr_edit_toolbar_plugin_meta', 10, 2 );
-endif; // end of pr_edit_toolbar_plugin_meta()
+
 ?>
