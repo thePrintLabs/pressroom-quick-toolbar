@@ -250,4 +250,40 @@ function return_short_title( $title_to_shorten, $if_empty ) {
 	return $return_value;
 }
 
+/* ==========================================================================
+   PRESSROOM ADMIN STYLES
+   ========================================================================== */
+
+function pr_admin_styles() {
+    echo '<style type="text/css">
+    #wp-admin-bar-issue_list li:first-child {
+        border-bottom: 1px solid #545454;
+    }
+    #wp-admin-bar-issue_list li div {
+        border-top: 1px solid #545454;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: .9em;
+    }
+    #wp-admin-bar-issue_list-default li a,  #wp-admin-bar-issue_list-default li div {
+        padding: 3px 14px !important;
+    }
+    #wp-admin-bar-flush_theme_cache #pr-flush-themes-cache {
+        height: auto;
+        text-decoration: none;
+        box-shadow: none;
+        text-align: left;
+        float: none;
+        line-height: 1;
+        padding: 6px 14px !important;
+    }
+    #wp-admin-bar-flush_theme_cache .ab-item  {
+        height: auto!important;
+    }
+    </style>';
+}
+
+add_action('admin_head', 'pr_admin_styles');
+
 ?>
