@@ -188,7 +188,7 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
 function pr_recently_edited_issues() {
 	global $no_page_edits_to_show;
 	$args = array(
-		'number' => $no_page_edits_to_show,
+		'posts_per_page' => $no_page_edits_to_show,
 		'post_type' => 'pr_edition',
 		'post_status' => 'publish',
 		'sort_column' => 'post_modified',
@@ -202,7 +202,7 @@ function pr_recently_edited_issues() {
 function pr_recently_edited_issue_drafts() {
 	global $no_issue_drafts_to_show;
 	$args = array(
-		'number' => $no_issue_drafts_to_show,
+		'posts_per_page' => $no_issue_drafts_to_show,
 		'post_type' => 'pr_edition',
 		'post_status' => 'draft',
 		'sort_column' => 'post_modified',
@@ -216,7 +216,7 @@ function pr_recently_edited_issue_drafts() {
 function pr_recently_edited_issue_future() {
 	global $no_issue_future_to_show;
 	$args = array(
-		'number' => $no_issue_future_to_show,
+		'posts_per_page' => $no_issue_future_to_show,
 		'post_type' => 'pr_edition',
 		'post_status' => 'future',
 		'sort_column' => 'post_modified',
