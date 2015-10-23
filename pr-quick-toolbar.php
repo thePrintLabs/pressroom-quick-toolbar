@@ -304,22 +304,35 @@ function pr_toolbar_admin_inline_js(){
 
     echo "<script type='text/javascript'>\n";
     echo "
-    $('#pr-toolbar-flush-themes-cache').click(function(){
-        $.post(ajaxurl, {
-            'action':'pr_flush_themes_cache'
-        }, function(response) {
-            if (response.success) {
-                document.location.href = pr.flush_redirect_url;
-            } else {
-                alert(pr.flush_failed);
-            }
-        });
-    });
+		(function($) {
+	    $('#pr-toolbar-flush-themes-cache').click(function(e){
+				e.preventDefault();
+	        $.post(ajaxurl, {
+	            'action':'pr_flush_themes_cache_toolbar'
+	        }, function(response) {
+	            if (response.success) {
+								document.location.href = document.location.href + '?refresh_cache=true&pmtype=updated&pmcode=themes_cache_flushed';
+	            } else {
+	                alert('An error occurred during cache flush');
+	            }
+	        });
+	    });
+		})(jQuery);
     ";
     echo "\n</script>";
 
 }
+add_action( 'admin_footer', 'pr_toolbar_admin_inline_js' );
 
-// add_action( 'admin_print_scripts', 'pr_toolbar_admin_inline_js' );
+/**
+ * Ajax function for flush themes cache
+ * @return json string
+ */
+function pr_flush_themes_cache() {
 
-?>
+	if ( delete_option( 'pressroom_themes' ) ) {
+		wp_send_json_success();
+	}
+	wp_send_json_error();
+}
+add_action( 'wp_ajax_pr_flush_themes_cache_toolbar', 'pr_flush_themes_cache' );
