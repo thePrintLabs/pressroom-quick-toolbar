@@ -1,7 +1,6 @@
 <?php
 
 /*
-
 Plugin Name: PressRoom Quick Toolbar
 Plugin URI:
 Description: Adds a dropdown 'PressRoom' to the WordPress toolbar as a quick access to PressRoom settings, developer functions and recently edited Issues ( published, drafts, scheduled )
@@ -10,7 +9,6 @@ Author: thePrintLabs
 
 Release Notes:
 1.0.0 - First release.
-
 */
 
 if ( !function_exists('add_action') )
@@ -23,11 +21,12 @@ if (!isset($no_issue_edits_to_show )) { $no_issue_edits_to_show  = 3; }
 add_action( 'admin_bar_menu', 'pr_issue_admin_bar_function', 998 );
 
 /*
-   PR EDITIONS
+   PR TOOLBAR NODES
    ========================================================================== */
 
 function pr_issue_admin_bar_function( $wp_admin_bar ) {
 
+    // Main Node
     $args = array(
         'id' => 'issue_list',
         'title' => 'PressRoom',
@@ -35,14 +34,15 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
     );
     $wp_admin_bar->add_node( $args );
 
+    // Flush Theme Cache
     $args = array(
         'id' => 'flush_theme_cache',
-        'title' => '<a href="#" class="button button-primary right" id="pr-flush-themes-cache">Flush Theme Cache</a>',
+        'title' => '<a href="#" class="button button-primary right" id="pr-toolbar-flush-themes-cache">Flush Theme Cache</a>',
         'parent' => 'issue_list'
     );
     $wp_admin_bar->add_node( $args );
 
-    // top item in list is add new page
+    // Add New Issue
     $args = array(
         'id' => 'issue_item_a',
         'title' => 'Add New Issue',
@@ -52,7 +52,7 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
     $wp_admin_bar->add_node( $args );
 
 /*
-    DRAFTS ISSUES
+    PR TOOLBAR DRAFTS ISSUES
     ========================================================================== */
 
     $issue_drafts_found = 'N';
@@ -94,7 +94,7 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
 
 
 /*
-    SCHEDULED ISSUES
+    PR TOOLBAR SCHEDULED ISSUES
     ========================================================================== */
 
     $issue_future_found = 'N';
@@ -135,7 +135,7 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
 
 
 /*
-   PUBLISHED ISSUES
+   PR TOOLBAR PUBLISHED ISSUES
    ========================================================================== */
 
     // get list of Issues
@@ -186,9 +186,9 @@ function pr_issue_admin_bar_function( $wp_admin_bar ) {
 }
 
 function pr_recently_edited_issues() {
-	global $no_page_edits_to_show;
+	global $no_issue_edits_to_show;
 	$args = array(
-		'posts_per_page' => $no_page_edits_to_show,
+		'posts_per_page' => $no_issue_edits_to_show,
 		'post_type' => 'pr_edition',
 		'post_status' => 'publish',
 		'sort_column' => 'post_modified',
@@ -251,7 +251,7 @@ function return_short_title( $title_to_shorten, $if_empty ) {
 }
 
 /* ==========================================================================
-   PRESSROOM ADMIN STYLES
+   PR TOOLBAR ADMIN STYLES
    ========================================================================== */
 
 function pr_admin_styles() {
@@ -269,14 +269,14 @@ function pr_admin_styles() {
     #wp-admin-bar-issue_list-default li a,  #wp-admin-bar-issue_list-default li div {
         padding: 3px 14px !important;
     }
-    #wp-admin-bar-flush_theme_cache #pr-flush-themes-cache {
+    #wp-admin-bar-flush_theme_cache #pr-toolbar-flush-themes-cache {
         height: auto;
         text-decoration: none;
         box-shadow: none;
         text-align: left;
         float: none;
         line-height: 1;
-        padding: 6px 14px !important;
+        padding: 6px 14px 6px 0 !important;
     }
     #wp-admin-bar-flush_theme_cache .ab-item  {
         height: auto!important;
@@ -284,6 +284,42 @@ function pr_admin_styles() {
     </style>';
 }
 
-add_action('admin_head', 'pr_admin_styles');
+add_action('admin_footer', 'pr_admin_styles');
+
+/* ==========================================================================
+   PR TOOLBAR ADMIN SCRIPT
+   ========================================================================== */
+
+function pr_toolbar_admin_enqueue_js($hook) {
+    if ( 'edit.php' != $hook ) {
+        return;
+    }
+
+    wp_enqueue_script( 'my_custom_script', plugin_dir_url( __FILE__ ) . '/assets/js/pr_toolbar.js' );
+}
+
+add_action( 'admin_enqueue_scripts', 'pr_toolbar_admin_enqueue_js' );
+
+function pr_toolbar_admin_inline_js(){
+
+    echo "<script type='text/javascript'>\n";
+    echo "
+    $('#pr-toolbar-flush-themes-cache').click(function(){
+        $.post(ajaxurl, {
+            'action':'pr_flush_themes_cache'
+        }, function(response) {
+            if (response.success) {
+                document.location.href = pr.flush_redirect_url;
+            } else {
+                alert(pr.flush_failed);
+            }
+        });
+    });
+    ";
+    echo "\n</script>";
+
+}
+
+// add_action( 'admin_print_scripts', 'pr_toolbar_admin_inline_js' );
 
 ?>
